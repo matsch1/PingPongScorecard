@@ -1,25 +1,24 @@
-from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
+from Layout_Player import LayoutPlayer
+from Layout_Buttons import LayoutButtons
 
-class View(BoxLayout):
+class View(GridLayout):
     def __init__(self, controller):
         super(View, self).__init__()
-        self.orientation = 'vertical'
         self.controller = controller
 
-        self.button = Button(text=controller.get_button_text())
-        self.button.bind(on_press=self.on_button_pressed)
-        self.button.bind(on_release=self.on_button_release)
-        self.add_widget(self.button)
+        self.cols = 1
+        self.subgrid = GridLayout()
+        self.subgrid.cols = controller.model.number_of_players
+        self.add_widget(self.subgrid)
+        
+        self.layout_players = []
+        for index_player in range(controller.model.number_of_players):
+            self.layout_players.append(LayoutPlayer(controller,index_player))
+            self.subgrid.add_widget(self.layout_players[index_player])
 
-        self.label = Label(text=controller.get_label_text())
-        self.add_widget(self.label)
+        self.add_widget(LayoutButtons(self))
 
-    def on_button_pressed(self, instance):
-        self.controller.button_pressed()
-        self.label.text = self.controller.get_label_text()
 
-    def on_button_release(self, instance):
-        self.controller.button_released()
-        self.label.text = self.controller.get_label_text()

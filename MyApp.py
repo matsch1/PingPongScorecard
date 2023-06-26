@@ -9,6 +9,10 @@ from Layout import View
 
 
 class MyApp(App):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        
+
     def build(self):
         model = Model()
         controller = Controller(model)
