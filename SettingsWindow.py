@@ -17,6 +17,8 @@ class SettingsLayout(GridLayout):
         self.cols=1
 
         self.subgrid = GridLayout()
+        #self.subgrid.size_hint_x=self.width*0.8
+        #self.subgrid.size_hint_y=None
         self.subgrid.cols = 1
 
         self.player_settings=[]
@@ -26,7 +28,7 @@ class SettingsLayout(GridLayout):
         
         self.subgrid_winningpoints = GridLayout()
         self.subgrid_winningpoints.cols = 2
-        self.subgrid_winningpoints.winning_points = TextInput(text = str(self.main_screen.controller.model.winning_points))
+        self.subgrid_winningpoints.winning_points = TextInput(text = str(self.main_screen.controller.model.winning_points), halign="center")
         self.subgrid_winningpoints.submit = Button(text = "change winning points")
         self.subgrid_winningpoints.submit.bind(on_press = self.change_winning_points)
         self.subgrid_winningpoints.add_widget(self.subgrid_winningpoints.winning_points)
@@ -36,7 +38,7 @@ class SettingsLayout(GridLayout):
         self.add_widget(self.subgrid)
 
 
-        self.Return=Button(text="Back")
+        self.Return=Button(text="Back",size_hint_x=1,size_hint_y=0.15)
         self.Return.bind(on_press = self.press_return)
         self.add_widget(self.Return)
 
@@ -55,7 +57,7 @@ class PlayerSettings(GridLayout):
         self.settings_layout = settings_layout
 
         self.cols = 2
-        self.name = TextInput(text = settings_layout.main_screen.controller.model.players[index_player].name)
+        self.name = TextInput(text = settings_layout.main_screen.controller.model.players[index_player].name, halign="center")
         self.index_player = index_player
         self.submit = Button(text = "change name")
         self.submit.bind(on_press=self.change_name)

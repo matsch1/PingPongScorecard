@@ -17,6 +17,9 @@ class LayoutMain(GridLayout):
         self.controller = controller
 
         self.cols = 1
+        #self.size_hint_x=None
+        #self.size_hint_y=0.5
+
         self.subgrid = GridLayout()
         self.subgrid.cols = controller.model.number_of_players
         self.add_widget(self.subgrid)
@@ -56,21 +59,21 @@ class LayoutPlayer(GridLayout):
         self.index_player = index_player
         super(LayoutPlayer, self).__init__()
         self.cols = 1
-
-        self.player_name = Label(text=self.layout.controller.model.players[self.index_player].name)
+        
+        self.player_name = Label(text=self.layout.controller.model.players[self.index_player].name, font_size=48,size_hint_x=1,size_hint_y = 1)
         self.add_widget(self.player_name)
 
         self.player_wins = Label(text = "Wins: 0")
         self.add_widget(self.player_wins)
 
-        self.player_score = Label(text = "Points: 0")
+        self.player_score = Label(text = "Points: 0", font_size=32)
         self.add_widget(self.player_score)
 
-        self.button_increment = Button(text="+1")
+        self.button_increment = Button(text="+1", font_size="20sp",background_color =(1, 0, 0, 1))
         self.button_increment.bind(on_press=self.press_increment)
         self.add_widget(self.button_increment)
 
-        self.button_decrement = Button(text="-1")
+        self.button_decrement = Button(text="-1", font_size="20sp",background_color =(1, 0, 0, 1))
         self.button_decrement.bind(on_press=self.press_decrement)
         self.add_widget(self.button_decrement)
 
@@ -106,8 +109,14 @@ class LayoutButtons(GridLayout):
         super().__init__(**kwargs)
         self.layout = layout
         self.cols = 3
+        #self.font_size=32
+        self.size_hint_y = 0.15
+        #self.height=50
+        self.size_hint_x = 1
+        #self.width=200
+			
 
-        self.new_game = Button(text="New Game")
+        self.new_game = Button(text="New Game",size_hint_x = 1, size_hint_y=1.5)
         self.new_game.bind(on_press=self.layout.press_new_game)
         self.add_widget(self.new_game)
 
