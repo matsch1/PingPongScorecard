@@ -2,7 +2,9 @@ from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
-from kivy.uix.screenmanager import Screen, FadeTransition
+from kivy.uix.screenmanager import Screen
+from kivy.uix.popup import Popup
+
 
 class MainWindow(Screen):
     def __init__(self,controller, **kwargs):
@@ -85,7 +87,8 @@ class LayoutPlayer(GridLayout):
 
         if wins_old != self.layout.controller.model.players[self.index_player].wins:
             #winner popup
-            "You Win - Start new game"
+            popup = winner_popup(self.layout.controller.model.players[self.index_player].name)
+            popup.open()  
             self.player_wins.text = self.update_wins(self.layout.controller.model.players[self.index_player].wins)
             self.layout.press_new_game(instance)
 
@@ -127,3 +130,23 @@ class LayoutButtons(GridLayout):
         self.settings = Button(text="Settings")
         self.settings.bind(on_press=self.layout.press_settings)
         self.add_widget(self.settings)
+
+
+############
+class winner_popup(Popup):
+    def __init__(self,name, **kwargs):
+        super(winner_popup,self).__init__(**kwargs)
+        self.title = "Congratulations"
+
+        self.layout = GridLayout()
+        self.layout.cols = 1
+        self.label = Label(text = 'Congratulations ' + name + '\nYou win!',font_size = 48, halign = "center")
+        self.button = Button(text = "Close an New Game",font_size = "48")
+        self.button.bind(on_press = self.close_and_new)
+        self.layout.add_widget(self.label)
+        self.layout.add_widget(self.button)
+
+        self.add_widget(self.layout)
+
+    def close_and_new(self,instance):
+        self.dismiss()
