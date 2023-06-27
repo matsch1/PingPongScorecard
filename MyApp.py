@@ -1,11 +1,12 @@
 # main.py
 
 from kivy.app import App
+from kivy.uix.screenmanager import ScreenManager
 
 from Model import Model
 from Controller import Controller
-from Layout import View
-
+from MainWindow import MainWindow
+from SettingsWindow import SettingsWindow
 
 
 class MyApp(App):
@@ -16,8 +17,15 @@ class MyApp(App):
     def build(self):
         model = Model()
         controller = Controller(model)
-        view = View(controller)
-        return view
+        main_screen = MainWindow(controller,name="main_screen")
+        settings_screen = SettingsWindow(controller,name="settings_screen")
+        self.screen_manager = ScreenManager()
+
+        self.screen_manager.add_widget(main_screen)
+        self.screen_manager.add_widget(settings_screen)
+        self.screen_manager.current = "main_screen"
+
+        return self.screen_manager
 
 
 if __name__ == '__main__':
