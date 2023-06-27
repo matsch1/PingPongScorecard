@@ -7,11 +7,13 @@ from kivy.uix.screenmanager import Screen, FadeTransition
 class MainWindow(Screen):
     def __init__(self,controller, **kwargs):
         super(MainWindow,self).__init__(**kwargs)
-        self.add_widget(View(controller))
+        self.LayoutMain = LayoutMain(controller)
+        self.add_widget(self.LayoutMain)
 
-class View(GridLayout):
+
+class LayoutMain(GridLayout):
     def __init__(self, controller):
-        super(View, self).__init__()
+        super(LayoutMain, self).__init__()
         self.controller = controller
 
         self.cols = 1
@@ -42,6 +44,8 @@ class View(GridLayout):
         self.app.screen_manager.current="settings_screen"
         self.app.screen_manager.transition.direction="left"
 
+    def change_player_name(self, name, index_player):
+        self.layout_players[index_player].set_name(name.text)
 
 
 ###################
@@ -53,8 +57,7 @@ class LayoutPlayer(GridLayout):
         super(LayoutPlayer, self).__init__()
         self.cols = 1
 
-
-        self.player_name = Label(text=self.layout.controller.model.players[self.index_player].name + " " + str(self.index_player + 1))
+        self.player_name = Label(text=self.layout.controller.model.players[self.index_player].name)
         self.add_widget(self.player_name)
 
         self.player_wins = Label(text = "Wins: 0")
@@ -92,6 +95,9 @@ class LayoutPlayer(GridLayout):
     
     def update_wins(self, wins):
         return 'Wins: ' + str(wins)
+    
+    def set_name(self, name):
+        self.player_name.text = name
     
 ############
 

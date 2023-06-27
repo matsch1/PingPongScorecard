@@ -18,7 +18,8 @@ class MyApp(App):
         model = Model()
         controller = Controller(model)
         main_screen = MainWindow(controller,name="main_screen")
-        settings_screen = SettingsWindow(controller,name="settings_screen")
+        main_screen.controller = controller
+        settings_screen = SettingsWindow(main_screen,name="settings_screen")
         self.screen_manager = ScreenManager()
 
         self.screen_manager.add_widget(main_screen)

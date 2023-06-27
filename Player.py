@@ -1,7 +1,7 @@
 class Player():
     def __init__(self,player_index) -> None:
         self.index = player_index
-        self.name = "Player"
+        self.name = "Player " + str(player_index)
         self.score = 0
         self.wins = 0
 

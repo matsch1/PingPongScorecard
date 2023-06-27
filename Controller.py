@@ -22,3 +22,6 @@ class Controller:
     def reset_wins(self):
         for index_player in range(0,len(self.model.players)):
             self.model.players[index_player].set_wins(0)
+
+    def set_winning_points(self, winning_points):
+        self.model.winning_points = winning_points
