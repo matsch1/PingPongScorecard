@@ -3,7 +3,8 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
-from MainWindow import LayoutMain
+from kivy.uix.label import Label
+from kivy.uix.checkbox import CheckBox
 
 class SettingsWindow(Screen):
     def __init__(self,main_screen, **kw):
@@ -26,14 +27,24 @@ class SettingsLayout(GridLayout):
             self.player_settings.append(PlayerSettings(self,index_player))
             self.subgrid.add_widget(self.player_settings[index_player])
         
-        self.subgrid_winningpoints = GridLayout()
-        self.subgrid_winningpoints.cols = 2
-        self.subgrid_winningpoints.winning_points = TextInput(text = str(self.main_screen.controller.model.winning_points), halign="center")
-        self.subgrid_winningpoints.submit = Button(text = "change winning points")
-        self.subgrid_winningpoints.submit.bind(on_press = self.change_winning_points)
-        self.subgrid_winningpoints.add_widget(self.subgrid_winningpoints.winning_points)
-        self.subgrid_winningpoints.add_widget(self.subgrid_winningpoints.submit)
-        self.subgrid.add_widget(self.subgrid_winningpoints)
+        self.winning_points = GridLayout()
+        self.winning_points.cols = 2
+        self.winning_points.winning_points = TextInput(text = str(self.main_screen.controller.model.winning_points), halign="center")
+        self.winning_points.submit = Button(text = "change winning points")
+        self.winning_points.submit.bind(on_press = self.change_winning_points)
+        self.winning_points.add_widget(self.winning_points.winning_points)
+        self.winning_points.add_widget(self.winning_points.submit)
+        self.subgrid.add_widget(self.winning_points)
+
+        self.sound = GridLayout()
+        self.sound.cols=2
+        self.sound.Label=Label(text = "Activate Sounds")
+        self.sound.CB = CheckBox(active = self.main_screen.controller.model.get_sound_active, color = (1,1,0))
+        self.sound.CB.bind(active = self.soundCB_active)
+        self.sound.add_widget(self.sound.Label)
+        self.sound.add_widget(self.sound.CB)
+        #self.subgrid.add_widget(self.sound)
+
 
         self.add_widget(self.subgrid)
 
@@ -49,7 +60,14 @@ class SettingsLayout(GridLayout):
         self.app.screen_manager.transition.direction="right"
 
     def change_winning_points(self, instance):
-        self.main_screen.controller.set_winning_points(int(self.subgrid_winningpoints.winning_points.text))
+        self.main_screen.controller.set_winning_points(int(self.winning_points.winning_points.text))
+
+    def soundCB_active(self,instance,isActive):
+        if isActive:
+            self.main_screen.controller.model.sound_active = True
+        else:
+            self.main_screen.controller.model.sound_active = False
+
 
 class PlayerSettings(GridLayout):
     def __init__(self,settings_layout,index_player) -> None:

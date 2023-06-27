@@ -1,6 +1,10 @@
+import pyttsx3 
+import time 
+ 
 class Controller:
     def __init__(self, model):
         self.model = model
+        
 
     def score_increment(self,index_player):
         self.model.players[index_player].score = self.model.players[index_player].score + 1
@@ -25,3 +29,18 @@ class Controller:
 
     def set_winning_points(self, winning_points):
         self.model.winning_points = winning_points
+    
+    def say_text(self, text):
+        self.speaker = pyttsx3.init() 
+        self.change_voice('English')
+        self.speaker.say(text)  
+        self.speaker.runAndWait()
+        #self.speaker.stop()
+        time.sleep(3)
+
+    def change_voice(self, language):
+        for voice in self.speaker.getProperty('voices'):
+            if voice.name.find(language) > 0:
+                self.speaker.setProperty('voice', voice.id)
+                return True
+  

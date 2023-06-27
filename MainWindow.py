@@ -4,6 +4,7 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 from kivy.uix.popup import Popup
+import time
 
 
 class MainWindow(Screen):
@@ -22,14 +23,14 @@ class LayoutMain(GridLayout):
         #self.size_hint_x=None
         #self.size_hint_y=0.5
 
-        self.subgrid = GridLayout()
-        self.subgrid.cols = controller.model.number_of_players
-        self.add_widget(self.subgrid)
-        
+        self.subgrid_players = GridLayout()
+        self.subgrid_players.cols = controller.model.number_of_players
+                
         self.layout_players = []
         for index_player in range(controller.model.number_of_players):
             self.layout_players.append(LayoutPlayer(self,index_player))
-            self.subgrid.add_widget(self.layout_players[index_player])
+            self.subgrid_players.add_widget(self.layout_players[index_player])
+        self.add_widget(self.subgrid_players)
 
         self.add_widget(LayoutButtons(self))
 
@@ -56,13 +57,14 @@ class LayoutMain(GridLayout):
 ###################
 
 class LayoutPlayer(GridLayout):
-    def __init__(self, layout,index_player):
-        self.layout = layout
-        self.index_player = index_player
+    def __init__(self, layout_players,index_player):
         super(LayoutPlayer, self).__init__()
         self.cols = 1
+
+        self.layout_players = layout_players
+        self.index_player = index_player
         
-        self.player_name = Label(text=self.layout.controller.model.players[self.index_player].name, font_size=48,size_hint_x=1,size_hint_y = 1)
+        self.player_name = Label(text=self.layout_players.controller.model.players[self.index_player].name, font_size=48,size_hint_x=1,size_hint_y = 1)
         self.add_widget(self.player_name)
 
         self.player_wins = Label(text = "Wins: 0")
@@ -80,21 +82,20 @@ class LayoutPlayer(GridLayout):
         self.add_widget(self.button_decrement)
 
     def press_increment(self,instance):
-        wins_old = self.layout.controller.model.players[self.index_player].wins
+        wins_old = self.layout_players.controller.model.players[self.index_player].wins
 
-        self.layout.controller.score_increment(self.index_player)
-        self.player_score.text = self.update_score(self.layout.controller.model.players[self.index_player].score)
+        self.layout_players.controller.score_increment(self.index_player)
+        self.player_score.text = self.update_score(self.layout_players.controller.model.players[self.index_player].score)
 
-        if wins_old != self.layout.controller.model.players[self.index_player].wins:
-            #winner popup
-            popup = winner_popup(self.layout.controller.model.players[self.index_player].name)
+        if wins_old != self.layout_players.controller.model.players[self.index_player].wins:
+            popup = winner_popup(self)
             popup.open()  
-            self.player_wins.text = self.update_wins(self.layout.controller.model.players[self.index_player].wins)
-            self.layout.press_new_game(instance)
+            self.player_wins.text = self.update_wins(self.layout_players.controller.model.players[self.index_player].wins)
+            self.layout_players.press_new_game(instance)
 
     def press_decrement(self,instance):
-        self.layout.controller.score_decrement(self.index_player)
-        self.player_score.text = self.update_score(self.layout.controller.model.players[self.index_player].score)
+        self.layout_players.controller.score_decrement(self.index_player)
+        self.player_score.text = self.update_score(self.layout_players.controller.model.players[self.index_player].score)
 
     def update_score(self, score):
         return 'Points: ' + str(score)
@@ -108,9 +109,9 @@ class LayoutPlayer(GridLayout):
 ############
 
 class LayoutButtons(GridLayout):
-    def __init__(self,layout, **kwargs):
+    def __init__(self,layout_main, **kwargs):
         super().__init__(**kwargs)
-        self.layout = layout
+        self.layout_main = layout_main
         self.cols = 3
         #self.font_size=32
         self.size_hint_y = 0.15
@@ -120,33 +121,39 @@ class LayoutButtons(GridLayout):
 			
 
         self.new_game = Button(text="New Game",size_hint_x = 1, size_hint_y=1.5)
-        self.new_game.bind(on_press=self.layout.press_new_game)
+        self.new_game.bind(on_press=self.layout_main.press_new_game)
         self.add_widget(self.new_game)
 
         self.reset_wins = Button(text="Reset All")
-        self.reset_wins.bind(on_press=self.layout.press_reset_all)
+        self.reset_wins.bind(on_press=self.layout_main.press_reset_all)
         self.add_widget(self.reset_wins)
 
         self.settings = Button(text="Settings")
-        self.settings.bind(on_press=self.layout.press_settings)
+        self.settings.bind(on_press=self.layout_main.press_settings)
         self.add_widget(self.settings)
 
 
 ############
 class winner_popup(Popup):
-    def __init__(self,name, **kwargs):
+    def __init__(self,layout_player, **kwargs):
         super(winner_popup,self).__init__(**kwargs)
         self.title = "Congratulations"
+        self.size_hint_x=0.8
+        self.size_hint_y=0.6
 
         self.layout = GridLayout()
         self.layout.cols = 1
-        self.label = Label(text = 'Congratulations ' + name + '\nYou win!',font_size = 48, halign = "center")
-        self.button = Button(text = "Close an New Game",font_size = "48")
+        self.label = Label(text = 'Congratulations ' + layout_player.layout_players.controller.model.players[layout_player.index_player].name + '\nYou win!',font_size = 40, halign = "center")
+        self.button = Button(text = "Close and New Game",font_size = "40")
         self.button.bind(on_press = self.close_and_new)
         self.layout.add_widget(self.label)
         self.layout.add_widget(self.button)
 
         self.add_widget(self.layout)
+
+        if layout_player.layout_players.controller.model.sound_active:
+            time.sleep(2)
+            layout_player.layout_players.controller.say_text('Congratulations, you win')
 
     def close_and_new(self,instance):
         self.dismiss()
