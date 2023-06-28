@@ -5,6 +5,7 @@ class Model:
         self.number_of_players = 2
         self.winning_points = 11
         self.sound_active = False
+        self.language = "English"
 
         self.players = []
         for index_player in range(self.number_of_players):

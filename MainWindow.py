@@ -60,9 +60,11 @@ class LayoutPlayer(GridLayout):
     def __init__(self, layout_players,index_player):
         super(LayoutPlayer, self).__init__()
         self.cols = 1
-
+        
         self.layout_players = layout_players
         self.index_player = index_player
+        self.popup = winner_popup(self)
+
         
         self.player_name = Label(text=self.layout_players.controller.model.players[self.index_player].name, font_size=48,size_hint_x=1,size_hint_y = 1)
         self.add_widget(self.player_name)
@@ -88,8 +90,10 @@ class LayoutPlayer(GridLayout):
         self.player_score.text = self.update_score(self.layout_players.controller.model.players[self.index_player].score)
 
         if wins_old != self.layout_players.controller.model.players[self.index_player].wins:
-            popup = winner_popup(self)
-            popup.open()  
+            if self.layout_players.controller.model.sound_active:
+                self.layout_players.controller.speaker.say_text('Congratulations, you win')
+            
+            self.popup.open()  
             self.player_wins.text = self.update_wins(self.layout_players.controller.model.players[self.index_player].wins)
             self.layout_players.press_new_game(instance)
 
@@ -150,10 +154,6 @@ class winner_popup(Popup):
         self.layout.add_widget(self.button)
 
         self.add_widget(self.layout)
-
-        if layout_player.layout_players.controller.model.sound_active:
-            time.sleep(2)
-            layout_player.layout_players.controller.say_text('Congratulations, you win')
 
     def close_and_new(self,instance):
         self.dismiss()
