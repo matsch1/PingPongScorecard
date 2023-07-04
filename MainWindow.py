@@ -4,7 +4,7 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 from kivy.uix.popup import Popup
-import time
+#import time
 
 
 class MainWindow(Screen):
@@ -90,8 +90,8 @@ class LayoutPlayer(GridLayout):
         self.player_score.text = self.update_score(self.layout_players.controller.model.players[self.index_player].score)
 
         if wins_old != self.layout_players.controller.model.players[self.index_player].wins:
-            if self.layout_players.controller.model.sound_active:
-                self.layout_players.controller.speaker.say_text('Congratulations, you win')
+            #if self.layout_players.controller.model.sound_active:
+            #    self.layout_players.controller.speaker.say_text('Congratulations, you win')
             
             self.popup.open()  
             self.player_wins.text = self.update_wins(self.layout_players.controller.model.players[self.index_player].wins)

@@ -4,7 +4,7 @@ class Model:
     def __init__(self):
         self.number_of_players = 2
         self.winning_points = 11
-        self.sound_active = False
+        self.sound_active = True
         self.language = "English"
 
         self.players = []
