@@ -51,8 +51,7 @@ class LayoutMain(GridLayout):
         self.app.screen_manager.transition.direction="left"
 
     def change_player_name(self, name, index_player):
-        self.layout_players[index_player].set_name(name.text)
-
+        self.layout_players[index_player].set_name(name)
 
 ###################
 
@@ -63,9 +62,7 @@ class LayoutPlayer(GridLayout):
         
         self.layout_players = layout_players
         self.index_player = index_player
-        self.popup = winner_popup(self)
-
-        
+                
         self.player_name = Label(text=self.layout_players.controller.model.players[self.index_player].name, font_size=48,size_hint_x=1,size_hint_y = 1)
         self.add_widget(self.player_name)
 
@@ -92,7 +89,7 @@ class LayoutPlayer(GridLayout):
         if wins_old != self.layout_players.controller.model.players[self.index_player].wins:
             #if self.layout_players.controller.model.sound_active:
             #    self.layout_players.controller.speaker.say_text('Congratulations, you win')
-            
+            self.popup = winner_popup(self)
             self.popup.open()  
             self.player_wins.text = self.update_wins(self.layout_players.controller.model.players[self.index_player].wins)
             self.layout_players.press_new_game(instance)
@@ -122,7 +119,6 @@ class LayoutButtons(GridLayout):
         #self.height=50
         self.size_hint_x = 1
         #self.width=200
-			
 
         self.new_game = Button(text="New Game",size_hint_x = 1, size_hint_y=1.5)
         self.new_game.bind(on_press=self.layout_main.press_new_game)
@@ -136,24 +132,28 @@ class LayoutButtons(GridLayout):
         self.settings.bind(on_press=self.layout_main.press_settings)
         self.add_widget(self.settings)
 
-
 ############
 class winner_popup(Popup):
     def __init__(self,layout_player, **kwargs):
         super(winner_popup,self).__init__(**kwargs)
+        self.layout_player = layout_player
         self.title = "Congratulations"
         self.size_hint_x=0.8
         self.size_hint_y=0.6
 
         self.layout = GridLayout()
         self.layout.cols = 1
-        self.label = Label(text = 'Congratulations ' + layout_player.layout_players.controller.model.players[layout_player.index_player].name + '\nYou win!',font_size = 40, halign = "center")
+
+        self.label = Label(text = 'Congratulations ' + self.layout_player.layout_players.controller.model.players[self.layout_player.index_player].name + '\nYou win!',font_size = 40, halign = "center")
         self.button = Button(text = "Close and New Game",font_size = "40")
         self.button.bind(on_press = self.close_and_new)
         self.layout.add_widget(self.label)
         self.layout.add_widget(self.button)
 
         self.add_widget(self.layout)
+    
+    def update_names(self):
+        self.label = Label(text = 'Congratulations ' + self.layout_player.layout_players.controller.model.players[self.layout_player.index_player].name + '\nYou win!',font_size = 40, halign = "center")
 
     def close_and_new(self,instance):
         self.dismiss()

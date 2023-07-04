@@ -83,7 +83,7 @@ class PlayerSettings(GridLayout):
         self.add_widget(self.submit)
 
     def change_name(self,instance):
-        self.settings_layout.main_screen.controller.model.players[self.index_player].name = self.name
-        self.settings_layout.main_screen.LayoutMain.change_player_name(self.name, self.index_player)
+        self.settings_layout.main_screen.controller.model.players[self.index_player].name = self.name.text
+        self.settings_layout.main_screen.LayoutMain.change_player_name(self.name.text, self.index_player)
         
 
