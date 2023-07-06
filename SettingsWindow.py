@@ -30,7 +30,7 @@ class SettingsLayout(GridLayout):
         self.winning_points = GridLayout()
         self.winning_points.cols = 2
         self.winning_points.winning_points = TextInput(text = str(self.main_screen.controller.model.winning_points), halign="center")
-        self.winning_points.submit = Button(text = "change winning points")
+        self.winning_points.submit = Button(text = "change winning points",background_color = self.main_screen.controller.model.colors["button"])
         self.winning_points.submit.bind(on_press = self.change_winning_points)
         self.winning_points.add_widget(self.winning_points.winning_points)
         self.winning_points.add_widget(self.winning_points.submit)
@@ -77,7 +77,7 @@ class PlayerSettings(GridLayout):
         self.cols = 2
         self.name = TextInput(text = settings_layout.main_screen.controller.model.players[index_player].name, halign="center")
         self.index_player = index_player
-        self.submit = Button(text = "change name")
+        self.submit = Button(text = "change name",background_color =self.settings_layout.main_screen.controller.model.colors["button"])
         self.submit.bind(on_press=self.change_name)
         self.add_widget(self.name)
         self.add_widget(self.submit)

@@ -12,6 +12,7 @@ from SettingsWindow import SettingsWindow
 class MyApp(App):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.title = "PingPongScorecard"
 
     def build(self):
         model = Model()

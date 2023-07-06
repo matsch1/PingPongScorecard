@@ -13,7 +13,6 @@ class MainWindow(Screen):
         self.LayoutMain = LayoutMain(controller)
         self.add_widget(self.LayoutMain)
 
-
 class LayoutMain(GridLayout):
     def __init__(self, controller):
         super(LayoutMain, self).__init__()
@@ -67,18 +66,20 @@ class LayoutPlayer(GridLayout):
         self.add_widget(self.player_name)
 
         self.player_wins = Label(text = "Wins: 0")
-        self.add_widget(self.player_wins)
-
         self.player_score = Label(text = "Points: 0", font_size=32)
-        self.add_widget(self.player_score)
+        self.points=GridLayout(cols = 2)
+        self.points.add_widget(self.player_wins)
+        self.points.add_widget(self.player_score)
+        self.add_widget(self.points)
 
-        self.button_increment = Button(text="+1", font_size="20sp",background_color =(1, 0, 0, 1))
+        self.button_increment = Button(text="+1", font_size="20sp",background_color = self.layout_players.controller.model.colors["button"],size_hint_x=0.7,size_hint_y = 1)
         self.button_increment.bind(on_press=self.press_increment)
-        self.add_widget(self.button_increment)
-
-        self.button_decrement = Button(text="-1", font_size="20sp",background_color =(1, 0, 0, 1))
+        self.button_decrement = Button(text="-1", font_size="20sp",background_color = self.layout_players.controller.model.colors["button"],size_hint_x=0.3,size_hint_y = 1)
         self.button_decrement.bind(on_press=self.press_decrement)
-        self.add_widget(self.button_decrement)
+        self.button_points=GridLayout(cols = 2)
+        self.button_points.add_widget(self.button_increment)
+        self.button_points.add_widget(self.button_decrement)
+        self.add_widget(self.button_points)
 
     def press_increment(self,instance):
         wins_old = self.layout_players.controller.model.players[self.index_player].wins
@@ -137,7 +138,7 @@ class winner_popup(Popup):
     def __init__(self,layout_player, **kwargs):
         super(winner_popup,self).__init__(**kwargs)
         self.layout_player = layout_player
-        self.title = "Congratulations"
+        self.title = "Nice dude!"
         self.size_hint_x=0.8
         self.size_hint_y=0.6
 
@@ -145,7 +146,7 @@ class winner_popup(Popup):
         self.layout.cols = 1
 
         self.label = Label(text = 'Congratulations ' + self.layout_player.layout_players.controller.model.players[self.layout_player.index_player].name + '\nYou win!',font_size = 40, halign = "center")
-        self.button = Button(text = "Close and New Game",font_size = "40")
+        self.button = Button(text = "Close and New Game",font_size = "40",background_color = self.layout_player.layout_players.controller.model.colors["button"])
         self.button.bind(on_press = self.close_and_new)
         self.layout.add_widget(self.label)
         self.layout.add_widget(self.button)
