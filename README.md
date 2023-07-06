@@ -15,6 +15,4 @@ basic functionalities:
 
 
 learnings apk generation:
-- python devlopment can be done in windows and/or linux. but the results could be a little different
-- it is recommended to version all necessary files using git. So the scripts can be tested in both environments
-- for building an apk for android you can use buildozer: [wiki: buildozer learnings](https://github.com/matsch1/wiki/blob/main/docs/python/buildozer.md)
+- for building an apk for android you can use buildozer: [wiki: spl learnings](https://github.com/matsch1/wiki/blob/main/docs/android/apk_buildozer.md))
