@@ -1,5 +1,3 @@
-# main.py
-
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager
 
@@ -18,10 +16,9 @@ class MyApp(App):
         model = Model()
         controller = Controller(model)
         main_screen = MainWindow(controller,name="main_screen")
-        main_screen.controller = controller
         settings_screen = SettingsWindow(main_screen,name="settings_screen")
+        
         self.screen_manager = ScreenManager()
-
         self.screen_manager.add_widget(main_screen)
         self.screen_manager.add_widget(settings_screen)
         self.screen_manager.current = "main_screen"
