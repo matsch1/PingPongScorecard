@@ -37,7 +37,7 @@ class SettingsLayout(GridLayout):
         self.sound = GridLayout(cols = 2)
         self.sound.Label=Label(text = "Activate Sounds")
         self.sound.CB = CheckBox(active = self.settings_screen.main_screen.controller.model.get_sound_active(), color = (1,1,0))
-        #self.sound.CB.bind(active = self.soundCB_active)
+        self.sound.CB.bind(active = self.soundCB_active)
         self.sound.add_widget(self.sound.Label)
         self.sound.add_widget(self.sound.CB)
         self.subgrid.add_widget(self.sound)
