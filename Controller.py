@@ -1,4 +1,4 @@
-#import pyttsx3 
+import pyttsx3 
  
 class Controller:
     def __init__(self, model):
@@ -31,9 +31,8 @@ class Controller:
 
 class Speaker():
     def __init__(self,language) -> None:
-        #self.engine = pyttsx3.init() 
-        #self.change_voice(language)
-        pass
+        self.engine = pyttsx3.init() 
+        self.change_voice(language)
     def change_voice(self, language):
         for voice in self.engine.getProperty('voices'):
              if voice.name.find(language) > 0:
@@ -41,6 +40,5 @@ class Speaker():
                 return True
   
     def say_text(self,text):
-        #self.engine.say(text)  
-        #self.engine.runAndWait()
-        pass
+        self.engine.say(text)  
+        self.engine.runAndWait()
