@@ -15,4 +15,4 @@ basic functionalities:
 
 
 learnings apk generation:
-- for building an apk for android you can use buildozer: [wiki: spl learnings](https://github.com/matsch1/wiki/blob/main/docs/android/apk_buildozer.md))
+- for building an apk for android you can use buildozer: [wiki: apk learnings](https://github.com/matsch1/wiki/blob/main/docs/android/apk_buildozer.md)
