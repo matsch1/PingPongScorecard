@@ -4,16 +4,16 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 from kivy.uix.popup import Popup
-#import time
 
 
 class MainWindow(Screen):
-    def __init__(self,controller, **kwargs):
-        super(MainWindow,self).__init__(**kwargs)
+    def __init__(self, controller, **kwargs):
+        super(MainWindow, self).__init__(**kwargs)
         self.controller = controller
 
         self.LayoutMain = LayoutMain(self)
         self.add_widget(self.LayoutMain)
+
 
 class LayoutMain(GridLayout):
     def __init__(self, main_screen):
@@ -21,137 +21,173 @@ class LayoutMain(GridLayout):
         self.main_screen = main_screen
         self.cols = 1
 
-        self.subgrid_players = GridLayout( cols = main_screen.controller.model.number_of_players)
+        self.subgrid_players = GridLayout(
+            cols=main_screen.controller.model.number_of_players)
+
+        self.__add_widgets()
+
+    def __add_widgets(self):
         self.layout_players = []
-        for index_player in range(main_screen.controller.model.number_of_players):
-            self.layout_players.append(LayoutPlayer(self,index_player))
+        for index_player in range(self.main_screen.controller.model.number_of_players):
+            self.layout_players.append(LayoutPlayer(self, index_player))
             self.subgrid_players.add_widget(self.layout_players[index_player])
         self.add_widget(self.subgrid_players)
 
         self.add_widget(LayoutButtons(self))
 
-    def press_new_game(self, instance):
+    def button_pressed_new_game(self, instance):
         self.main_screen.controller.reset_scores()
-        for index_player in range(0,self.main_screen.controller.model.number_of_players):
-            self.layout_players[index_player].player_score.text = self.layout_players[index_player].update_score(self.main_screen.controller.model.players[index_player].score)
+        self.update_layout_score(instance)
 
-    def press_reset_all(self, instance):
+    def button_pressed_reset_all(self, instance):
         self.main_screen.controller.reset_wins()
-        for index_player in range(0,self.main_screen.controller.model.number_of_players):
-            self.layout_players[index_player].player_wins.text = self.layout_players[index_player].update_wins(self.main_screen.controller.model.players[index_player].wins)
-        self.press_new_game(instance)
+        self.__update_layout_wins(instance)
 
-    def press_settings(self, instance):
+        self.main_screen.controller.reset_scores()
+        self.update_layout_score(instance)
+
+    def button_pressed_settings(self, instance):
         self.app = App.get_running_app()
-        self.app.screen_manager.current="settings_screen"
-        self.app.screen_manager.transition.direction="left"
+        self.app.screen_manager.current = "settings_screen"
+        self.app.screen_manager.transition.direction = "left"
 
     def change_player_name(self, name, index_player):
-        self.layout_players[index_player].set_name(name)
+        self.layout_players[index_player].set_name_text(name)
 
-###################
+    def __update_layout_wins(self, instance):
+        for index_player in range(0, self.main_screen.controller.model.number_of_players):
+            self.layout_players[index_player].update_points_text('wins')
+
+    def update_layout_score(self, instance):
+        for index_player in range(0, self.main_screen.controller.model.number_of_players):
+            self.layout_players[index_player].update_points_text('score')
+
 
 class LayoutPlayer(GridLayout):
-    def __init__(self, LayoutMain,index_player):
+    def __init__(self, LayoutMain, index_player):
         super(LayoutPlayer, self).__init__()
         self.cols = 1
-        
+
         self.LayoutMain = LayoutMain
         self.index_player = index_player
-                
-        self.player_name = Label(text=self.LayoutMain.main_screen.controller.model.players[self.index_player].name, font_size=48,size_hint_x=1,size_hint_y = 1)
+
+        self.__add_widgets()
+
+    def __add_widgets(self):
+        self.player_name = Label(
+            text=self.LayoutMain.main_screen.controller.model.players[self.index_player].name, font_size=48, size_hint_x=1, size_hint_y=1)
         self.add_widget(self.player_name)
 
-        self.player_wins = Label(text = "Wins: 0")
-        self.player_score = Label(text = "Points: 0", font_size=32)
-        self.points=GridLayout(cols = 2)
-        self.points.add_widget(self.player_wins)
-        self.points.add_widget(self.player_score)
-        self.add_widget(self.points)
+        self.player_wins = Label()
+        self.update_points_text('wins')
+        self.player_score = Label(font_size=32)
+        self.update_points_text('score')
 
-        self.button_increment = Button(text="+1", font_size="20sp",background_color = self.LayoutMain.main_screen.controller.model.colors["button"],size_hint_x=0.7,size_hint_y = 1)
-        self.button_increment.bind(on_press=self.press_increment)
-        self.button_decrement = Button(text="-1", font_size="20sp",background_color = self.LayoutMain.main_screen.controller.model.colors["button"],size_hint_x=0.3,size_hint_y = 1)
-        self.button_decrement.bind(on_press=self.press_decrement)
-        self.button_points=GridLayout(cols = 2)
-        self.button_points.add_widget(self.button_increment)
-        self.button_points.add_widget(self.button_decrement)
-        self.add_widget(self.button_points)
+        self.PointsLayout = GridLayout(cols=2)
+        self.PointsLayout.add_widget(self.player_wins)
+        self.PointsLayout.add_widget(self.player_score)
+        self.add_widget(self.PointsLayout)
 
-    def press_increment(self,instance):
-        wins_old = self.LayoutMain.main_screen.controller.model.players[self.index_player].wins
+        self.button_increment = Button(
+            text="+1", font_size="20sp", background_color=self.LayoutMain.main_screen.controller.model.colors["button"], size_hint_x=0.7, size_hint_y=1)
+        self.button_increment.bind(on_press=self.button_pressed_increment)
+        self.button_decrement = Button(
+            text="-1", font_size="20sp", background_color=self.LayoutMain.main_screen.controller.model.colors["button"], size_hint_x=0.3, size_hint_y=1)
+        self.button_decrement.bind(on_press=self.button_pressed_decrement)
+        self.ButtonPointsLayoutLayout = GridLayout(cols=2)
+        self.ButtonPointsLayoutLayout.add_widget(self.button_increment)
+        self.ButtonPointsLayoutLayout.add_widget(self.button_decrement)
+        self.add_widget(self.ButtonPointsLayoutLayout)
 
-        self.LayoutMain.main_screen.controller.score_increment(self.index_player)
-        self.player_score.text = self.update_score(self.LayoutMain.main_screen.controller.model.players[self.index_player].score)
+    def button_pressed_increment(self, instance):
+        self.wins_old = self.LayoutMain.main_screen.controller.model.players[
+            self.index_player].wins.get()
 
-        if wins_old != self.LayoutMain.main_screen.controller.model.players[self.index_player].wins:
+        self.LayoutMain.main_screen.controller.score_increment(
+            self.index_player)
+        self.update_points_text('score')
+
+        self.__check_if_one_player_wins(instance)
+
+    def __check_if_one_player_wins(self, instance):
+        if self.wins_old != self.LayoutMain.main_screen.controller.model.players[self.index_player].wins.get():
             if self.LayoutMain.main_screen.controller.model.sound_active:
-                self.LayoutMain.main_screen.controller.speaker.say_text('Congratulations, you win')
+                self.LayoutMain.main_screen.controller.speaker.say_text(
+                    'Congratulations, you win')
             self.popup = winner_popup(self)
-            self.popup.open()  
-            self.player_wins.text = self.update_wins(self.LayoutMain.main_screen.controller.model.players[self.index_player].wins)
-            self.LayoutMain.press_new_game(instance)
+            self.popup.open()
+            self.update_points_text('wins')
 
-    def press_decrement(self,instance):
-        self.LayoutMain.main_screen.controller.score_decrement(self.index_player)
-        self.player_score.text = self.update_score(self.LayoutMain.main_screen.controller.model.players[self.index_player].score)
+            self.LayoutMain.main_screen.controller.reset_scores()
+            self.LayoutMain.update_layout_score(instance)
 
-    def update_score(self, score):
-        return 'Points: ' + str(score)
-    
-    def update_wins(self, wins):
-        return 'Wins: ' + str(wins)
-    
-    def set_name(self, name):
+    def button_pressed_decrement(self, instance):
+        self.LayoutMain.main_screen.controller.score_decrement(
+            self.index_player)
+        self.update_points_text('score')
+
+    def update_points_text(self, usecase):
+        if usecase == 'score':
+            self.player_score.text = 'Score: ' + str(self.LayoutMain.main_screen.controller.model.players[self.index_player].score.get(
+            ))
+        elif usecase == 'wins':
+            self.player_wins.text = 'Wins: ' + str(self.LayoutMain.main_screen.controller.model.players[self.index_player].wins.get(
+            ))
+
+    def set_name_text(self, name):
         self.player_name.text = name
-    
-############
+
 
 class LayoutButtons(GridLayout):
-    def __init__(self,LayoutMain, **kwargs):
+    def __init__(self, LayoutMain, **kwargs):
         super().__init__(**kwargs)
         self.LayoutMain = LayoutMain
         self.cols = 3
-        #self.font_size=32
+        # self.font_size=32
         self.size_hint_y = 0.15
-        #self.height=50
+        # self.height=50
         self.size_hint_x = 1
-        #self.width=200
+        # self.width=200
 
-        self.new_game = Button(text="New Game",size_hint_x = 1, size_hint_y=1.5)
-        self.new_game.bind(on_press=self.LayoutMain.press_new_game)
+        self.new_game = Button(text="New Game", size_hint_x=1, size_hint_y=1.5)
+        self.new_game.bind(on_press=self.LayoutMain.button_pressed_new_game)
         self.add_widget(self.new_game)
 
         self.reset_wins = Button(text="Reset All")
-        self.reset_wins.bind(on_press=self.LayoutMain.press_reset_all)
+        self.reset_wins.bind(on_press=self.LayoutMain.button_pressed_reset_all)
         self.add_widget(self.reset_wins)
 
         self.settings = Button(text="Settings")
-        self.settings.bind(on_press=self.LayoutMain.press_settings)
+        self.settings.bind(on_press=self.LayoutMain.button_pressed_settings)
         self.add_widget(self.settings)
 
 ############
+
+
 class winner_popup(Popup):
-    def __init__(self,LayoutPlayer, **kwargs):
-        super(winner_popup,self).__init__(**kwargs)
+    def __init__(self, LayoutPlayer, **kwargs):
+        super(winner_popup, self).__init__(**kwargs)
         self.LayoutPlayer = LayoutPlayer
         self.title = "Nice dude!"
-        self.size_hint_x=0.8
-        self.size_hint_y=0.6
+        self.size_hint_x = 0.8
+        self.size_hint_y = 0.6
 
         self.layout = GridLayout()
         self.layout.cols = 1
 
-        self.label = Label(text = 'Congratulations ' + self.LayoutPlayer.LayoutMain.main_screen.controller.model.players[self.LayoutPlayer.index_player].name + '\nYou win!',font_size = 40, halign = "center")
-        self.button = Button(text = "Close and New Game",font_size = "40",background_color = self.LayoutPlayer.LayoutMain.main_screen.controller.model.colors["button"])
-        self.button.bind(on_press = self.close_and_new)
+        self.label = Label(text='Congratulations ' +
+                           self.LayoutPlayer.LayoutMain.main_screen.controller.model.players[self.LayoutPlayer.index_player].name + '\nYou win!', font_size=40, halign="center")
+        self.button = Button(text="Close and New Game", font_size="40",
+                             background_color=self.LayoutPlayer.LayoutMain.main_screen.controller.model.colors["button"])
+        self.button.bind(on_press=self.close_and_new)
         self.layout.add_widget(self.label)
         self.layout.add_widget(self.button)
 
         self.add_widget(self.layout)
-    
-    def update_names(self):
-        self.label = Label(text = 'Congratulations ' + self.LayoutPlayer.LayoutMain.main_screen.controller.model.players[self.layout_player.index_player].name + '\nYou win!',font_size = 40, halign = "center")
 
-    def close_and_new(self,instance):
+    def update_names(self):
+        self.label = Label(text='Congratulations ' +
+                           self.LayoutPlayer.LayoutMain.main_screen.controller.model.players[self.layout_player.index_player].name + '\nYou win!', font_size=40, halign="center")
+
+    def close_and_new(self, instance):
         self.dismiss()
