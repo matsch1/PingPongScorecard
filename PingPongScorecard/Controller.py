@@ -31,13 +31,19 @@ class Controller:
 class Speaker():
     def __init__(self, language) -> None:
         self.engine = pyttsx3.init()
-        self.change_voice(language)
+        self.voice_name = ""
+        try:
+            self.change_voice(language)
+        except:
+            print(language + " is not available: use default language\n")
 
     def change_voice(self, language):
         for voice in self.engine.getProperty('voices'):
             if voice.name.find(language) > 0:
                 self.engine.setProperty('voice', voice.id)
+                self.voice_name = voice.name
                 return True
+        raise ValueError("Invalid Language: " + language)
 
     def say_text(self, text):
         self.engine.say(text)

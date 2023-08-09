@@ -1,10 +1,10 @@
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager
 
-from Model import Model
-from Controller import Controller
-from MainWindow import MainWindow
-from SettingsWindow import SettingsWindow
+from PingPongScorecard.Model import Model
+from PingPongScorecard.Controller import Controller
+from PingPongScorecard.MainWindow import MainWindow
+from PingPongScorecard.SettingsWindow import SettingsWindow
 
 
 class MyApp(App):
