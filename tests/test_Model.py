@@ -79,12 +79,12 @@ def test_model_init(model):
 
 
 def test_model_players_length(model):
-    length = len(model.players)
+    length = len(model.player)
     assert length == 2
 
 
 def test_model_players_class(model):
-    for player in model.players:
+    for player in model.player:
         assert player.score.get() == 0
 
 

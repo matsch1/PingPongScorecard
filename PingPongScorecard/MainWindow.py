@@ -1,32 +1,36 @@
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 from kivy.uix.popup import Popup
+from kivy.core.window import Window
 
 
 class MainWindow(Screen):
     def __init__(self, controller, **kwargs):
         super(MainWindow, self).__init__(**kwargs)
         self.controller = controller
+        # Window.clearcolor = (0, 0.6, 0.1, 1.0)
 
         self.LayoutMain = LayoutMain(self)
         self.add_widget(self.LayoutMain)
 
 
-class LayoutMain(GridLayout):
+class LayoutMain(BoxLayout):
     def __init__(self, main_screen):
         super(LayoutMain, self).__init__()
         self.main_screen = main_screen
-        self.cols = 1
-
-        self.subgrid_players = GridLayout(
-            cols=main_screen.controller.model.number_of_players)
+        self.orientation = 'vertical'
+        self.spacing = 10
 
         self.__add_widgets()
 
     def __add_widgets(self):
+        self.subgrid_players = GridLayout(
+            cols=self.main_screen.controller.model.number_of_players)
+        self.subgrid_players.spacing = 10
         self.layout_players = []
         for index_player in range(self.main_screen.controller.model.number_of_players):
             self.layout_players.append(LayoutPlayer(self, index_player))
@@ -67,6 +71,7 @@ class LayoutPlayer(GridLayout):
     def __init__(self, LayoutMain, index_player):
         super(LayoutPlayer, self).__init__()
         self.cols = 1
+        self.spacing = 5
 
         self.LayoutMain = LayoutMain
         self.index_player = index_player
@@ -75,7 +80,8 @@ class LayoutPlayer(GridLayout):
 
     def __add_widgets(self):
         self.player_name = Label(
-            text=self.LayoutMain.main_screen.controller.model.players[self.index_player].name, font_size=48, size_hint_x=1, size_hint_y=1)
+            text=self.LayoutMain.main_screen.controller.model.player[self.index_player].name, font_size=48)
+
         self.add_widget(self.player_name)
 
         self.player_wins = Label()
@@ -100,38 +106,38 @@ class LayoutPlayer(GridLayout):
         self.add_widget(self.ButtonPointsLayoutLayout)
 
     def button_pressed_increment(self, instance):
-        self.wins_old = self.LayoutMain.main_screen.controller.model.players[
+        self.wins_old = self.LayoutMain.main_screen.controller.model.player[
             self.index_player].wins.get()
 
-        self.LayoutMain.main_screen.controller.score_increment(
+        self.LayoutMain.main_screen.controller.increment_score(
             self.index_player)
         self.update_points_text('score')
 
         self.__check_if_one_player_wins(instance)
 
     def __check_if_one_player_wins(self, instance):
-        if self.wins_old != self.LayoutMain.main_screen.controller.model.players[self.index_player].wins.get():
-            if self.LayoutMain.main_screen.controller.model.sound_active:
+        if self.wins_old != self.LayoutMain.main_screen.controller.model.player[self.index_player].wins.get():
+            if self.LayoutMain.main_screen.controller.model.sound_activated:
                 self.LayoutMain.main_screen.controller.speaker.say_text(
                     'Congratulations, you win')
-            self.popup = winner_popup(self)
-            self.popup.open()
+            self.popup = Alert(style='Info', title='Congratulations ' + self.LayoutMain.main_screen.controller.model.player[self.index_player].name + '!',
+                               text='YOU WIN!', button_text='Close and New Game')
             self.update_points_text('wins')
 
             self.LayoutMain.main_screen.controller.reset_scores()
             self.LayoutMain.update_layout_score(instance)
 
     def button_pressed_decrement(self, instance):
-        self.LayoutMain.main_screen.controller.score_decrement(
+        self.LayoutMain.main_screen.controller.decrement_score(
             self.index_player)
         self.update_points_text('score')
 
     def update_points_text(self, usecase):
         if usecase == 'score':
-            self.player_score.text = 'Score: ' + str(self.LayoutMain.main_screen.controller.model.players[self.index_player].score.get(
+            self.player_score.text = 'Score: ' + str(self.LayoutMain.main_screen.controller.model.player[self.index_player].score.get(
             ))
         elif usecase == 'wins':
-            self.player_wins.text = 'Wins: ' + str(self.LayoutMain.main_screen.controller.model.players[self.index_player].wins.get(
+            self.player_wins.text = 'Wins: ' + str(self.LayoutMain.main_screen.controller.model.player[self.index_player].wins.get(
             ))
 
     def set_name_text(self, name):
@@ -164,30 +170,33 @@ class LayoutButtons(GridLayout):
 ############
 
 
-class winner_popup(Popup):
-    def __init__(self, LayoutPlayer, **kwargs):
-        super(winner_popup, self).__init__(**kwargs)
-        self.LayoutPlayer = LayoutPlayer
-        self.title = "Nice dude!"
-        self.size_hint_x = 0.8
-        self.size_hint_y = 0.6
+class Alert(Popup):
 
-        self.layout = GridLayout()
-        self.layout.cols = 1
+    def __init__(self, style, title, text, button_text):
+        super(Alert, self).__init__()
+        content = GridLayout(cols=1)
+        content.add_widget(
+            Label(text=text)
+        )
+        ok_button = Button(text=button_text)
+        content.add_widget(ok_button)
 
-        self.label = Label(text='Congratulations ' +
-                           self.LayoutPlayer.LayoutMain.main_screen.controller.model.players[self.LayoutPlayer.index_player].name + '\nYou win!', font_size=40, halign="center")
-        self.button = Button(text="Close and New Game", font_size="40",
-                             background_color=self.LayoutPlayer.LayoutMain.main_screen.controller.model.colors["button"])
-        self.button.bind(on_press=self.close_and_new)
-        self.layout.add_widget(self.label)
-        self.layout.add_widget(self.button)
+        if style == "Info":
+            ok_button.background_color = (0.4, 0.9, 0, 1)
+        elif style == "Warning":
+            ok_button.background_color = (1, 0.6, 0.1, 1)
+        elif style == "Error":
+            ok_button.background_color = (1, 0, 0, 1)
 
-        self.add_widget(self.layout)
+        else:
+            ValueError("Invalid Popup Style")
 
-    def update_names(self):
-        self.label = Label(text='Congratulations ' +
-                           self.LayoutPlayer.LayoutMain.main_screen.controller.model.players[self.layout_player.index_player].name + '\nYou win!', font_size=40, halign="center")
-
-    def close_and_new(self, instance):
-        self.dismiss()
+        popup = Popup(
+            title=title,
+            content=content,
+            size_hint=(None, None),
+            size=(Window.width / 3, Window.height / 3),
+            auto_dismiss=True,
+        )
+        ok_button.bind(on_press=popup.dismiss)
+        popup.open()

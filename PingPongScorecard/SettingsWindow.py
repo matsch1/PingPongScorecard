@@ -1,10 +1,13 @@
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
 from kivy.uix.checkbox import CheckBox
+
+from PingPongScorecard.MainWindow import Alert
 
 
 class SettingsWindow(Screen):
@@ -26,6 +29,7 @@ class SettingsLayout(GridLayout):
 
     def __add_widgets(self):
         self.subgrid = GridLayout(cols=1)
+        self.subgrid.spacing = 5
         self.player_settings = []
         for index_player in range(0, self.settings_screen.main_screen.controller.model.number_of_players):
             self.player_settings.append(PlayerSettings(self, index_player))
@@ -33,9 +37,11 @@ class SettingsLayout(GridLayout):
 
         self.MaxScoreNumberLayout = GridLayout(cols=2)
         self.MaxScoreNumberLayout.TextInput = TextInput(text=str(
-            self.settings_screen.main_screen.controller.model.max_score_number), halign="center")
+            self.settings_screen.main_screen.controller.model.max_score_number), halign="center", padding_y=[self.size[0]/2+5, 0], multiline=False)
+        self.MaxScoreNumberLayout.TextInput.bind(
+            on_text_validate=self.button_pressed_change_max_score_number)
         self.MaxScoreNumberLayout.submit = Button(
-            text="change score for win the game", background_color=self.settings_screen.main_screen.controller.model.colors["button"])
+            text="change score for winning the game", background_color=self.settings_screen.main_screen.controller.model.colors["button"])
         self.MaxScoreNumberLayout.submit.bind(
             on_press=self.button_pressed_change_max_score_number)
         self.MaxScoreNumberLayout.add_widget(
@@ -46,7 +52,7 @@ class SettingsLayout(GridLayout):
         self.SoundLayout = GridLayout(cols=2)
         self.SoundLayout.Label = Label(text="Activate Sounds")
         self.SoundLayout.CB = CheckBox(
-            active=self.settings_screen.main_screen.controller.model.get_sound_active(), color=(1, 1, 0))
+            active=self.settings_screen.main_screen.controller.model.sound_activated, color=(1, 1, 0))
         # self.SoundLayout.CB.bind(active = self.soundCB_active) # Funktionalität auskommentiert, da nicht lauffähig unter meiner Windows Verison, Ubunut i.O,
         self.SoundLayout.add_widget(self.SoundLayout.Label)
         self.SoundLayout.add_widget(self.SoundLayout.CB)
@@ -65,8 +71,14 @@ class SettingsLayout(GridLayout):
         self.app.screen_manager.transition.direction = "right"
 
     def button_pressed_change_max_score_number(self, instance):
-        self.settings_screen.main_screen.controller.model.set_max_score_number(
-            int(self.MaxScoreNumberLayout.TextInput.text))
+        new_score_number = int(self.MaxScoreNumberLayout.TextInput.text)
+        if new_score_number > 0 and new_score_number < 100:
+            self.settings_screen.main_screen.controller.model.max_score_number = new_score_number
+        else:
+            self.MaxScoreNumberLayout.TextInput.text = str(
+                self.settings_screen.main_screen.controller.model.max_score_number)
+            Alert(style='Warning', title='oops!',
+                  text='Invalid Max Score Number', button_text='Ok')
 
     def soundCB_active(self, instance, isActive):
         if isActive:
@@ -80,18 +92,32 @@ class PlayerSettings(GridLayout):
         super(PlayerSettings, self).__init__()
         self.SettingsLayout = SettingsLayout
         self.cols = 2
+        self.index_player = index_player
 
         self.name = TextInput(
-            text=SettingsLayout.settings_screen.main_screen.controller.model.players[index_player].name, halign="center")
-        self.index_player = index_player
+            text=SettingsLayout.settings_screen.main_screen.controller.model.player[index_player].name, halign="center", padding_y=[self.size[0]/2+5, 0], multiline=False)
+        self.name.bind(on_text_validate=self.change_player_name)
         self.submit = Button(
             text="change name", background_color=self.SettingsLayout.settings_screen.main_screen.controller.model.colors["button"])
-        self.submit.bind(on_press=self.change_name)
+        self.submit.bind(on_press=self.change_player_name)
         self.add_widget(self.name)
         self.add_widget(self.submit)
 
-    def change_name(self, instance):
-        self.SettingsLayout.settings_screen.main_screen.controller.model.players[
-            self.index_player].name = self.name.text
-        self.SettingsLayout.settings_screen.main_screen.LayoutMain.change_player_name(
-            self.name.text, self.index_player)
+    def change_player_name(self, instance):
+        new_player_name = self.name.text
+        if len(new_player_name) < 20:
+            self.SettingsLayout.settings_screen.main_screen.controller.model.player[
+                self.index_player].name = new_player_name
+            self.SettingsLayout.settings_screen.main_screen.LayoutMain.change_player_name(
+                new_player_name, self.index_player)
+        else:
+            self.name.text = self.SettingsLayout.settings_screen.main_screen.controller.model.player[
+                self.index_player].name
+            Alert(style='Warning', title='oops!',
+                  text='Invalid Player Name', button_text='Ok')
+
+
+class FormattedTextInput(TextInput):
+    def __init__(self, text) -> None:
+        self.halign = "center"
+        self.multiline = False
