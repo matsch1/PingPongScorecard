@@ -11,8 +11,8 @@ from PingPongScorecard.MainWindow import Alert
 
 
 class SettingsWindow(Screen):
-    def __init__(self, main_screen, **kw):
-        super().__init__(**kw)
+    def __init__(self, main_screen, **kwargs):
+        super().__init__(**kwargs)
         self.main_screen = main_screen
 
         self.LayoutSettings = SettingsLayout(self)
@@ -36,8 +36,8 @@ class SettingsLayout(GridLayout):
             self.subgrid.add_widget(self.player_settings[index_player])
 
         self.MaxScoreNumberLayout = GridLayout(cols=2)
-        self.MaxScoreNumberLayout.TextInput = TextInput(text=str(
-            self.settings_screen.main_screen.controller.model.max_score_number), halign="center", padding_y=[self.size[0]/2+5, 0], multiline=False)
+        self.MaxScoreNumberLayout.TextInput = FormattedTextInput(
+            self.settings_screen.main_screen.controller.model.max_score_number, debug=self.settings_screen.main_screen.controller.debug)
         self.MaxScoreNumberLayout.TextInput.bind(
             on_text_validate=self.button_pressed_change_max_score_number)
         self.MaxScoreNumberLayout.submit = Button(
@@ -94,8 +94,8 @@ class PlayerSettings(GridLayout):
         self.cols = 2
         self.index_player = index_player
 
-        self.name = TextInput(
-            text=SettingsLayout.settings_screen.main_screen.controller.model.player[index_player].name, halign="center", padding_y=[self.size[0]/2+5, 0], multiline=False)
+        self.name = FormattedTextInput(
+            text=SettingsLayout.settings_screen.main_screen.controller.model.player[index_player].name, debug=self.SettingsLayout.settings_screen.main_screen.controller.debug)
         self.name.bind(on_text_validate=self.change_player_name)
         self.submit = Button(
             text="change name", background_color=self.SettingsLayout.settings_screen.main_screen.controller.model.colors["button"])
@@ -118,6 +118,16 @@ class PlayerSettings(GridLayout):
 
 
 class FormattedTextInput(TextInput):
-    def __init__(self, text) -> None:
+    def __init__(self, text, debug=False) -> None:
+        super(FormattedTextInput, self).__init__()
         self.halign = "center"
         self.multiline = False
+
+        if debug:
+            self.padding_y = [self.height / 2.0 * 800/1334 -
+                              (self.line_height / 2.0 * 800/1334), 0]
+        else:
+            self.padding_y = [self.height / 2.0 -
+                              (self.line_height / 2.0), 0]
+
+        self.text = str(text)
