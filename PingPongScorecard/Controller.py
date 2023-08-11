@@ -1,10 +1,12 @@
 import pyttsx3
+from kivy.core.window import Window
 
 
 class Controller:
     def __init__(self, model):
         self.model = model
         self.speaker = Speaker(self.model.language)
+        self.debugger = Debugger(self.model.debug_active)
 
     def increment_score(self, index_player):
         self.model.player[index_player].score.increment()
@@ -48,3 +50,14 @@ class Speaker():
     def say_text(self, text):
         self.engine.say(text)
         self.engine.runAndWait()
+
+
+class Debugger():
+    def __init__(self, debug_active) -> None:
+        self.active = debug_active
+
+    def rescale_windowsize(self) -> None:
+        self.window_size_old = Window.size
+        # typical smartphone size (16:9) divided by 2 for better view on screen
+        self.window_size_new = [1334/2, 750/2]
+        Window.size = (self.window_size_new)

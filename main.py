@@ -13,11 +13,10 @@ class MyApp(App):
         self.title = "PingPongScorecard"
 
     def build(self):
-        debug = True
 
         model = Model()
         controller = Controller(model)
-        controller.debug = debug
+
         main_screen = MainWindow(controller, name="main_screen")
         settings_screen = SettingsWindow(
             main_screen, name="settings_screen")

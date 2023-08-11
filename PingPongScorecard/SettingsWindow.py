@@ -8,6 +8,7 @@ from kivy.uix.label import Label
 from kivy.uix.checkbox import CheckBox
 
 from PingPongScorecard.MainWindow import Alert
+from PingPongScorecard.Controller import Debugger
 
 
 class SettingsWindow(Screen):
@@ -37,7 +38,7 @@ class SettingsLayout(GridLayout):
 
         self.MaxScoreNumberLayout = GridLayout(cols=2)
         self.MaxScoreNumberLayout.TextInput = FormattedTextInput(
-            self.settings_screen.main_screen.controller.model.max_score_number, debug=self.settings_screen.main_screen.controller.debug)
+            self.settings_screen.main_screen.controller.model.max_score_number, debugger=self.settings_screen.main_screen.controller.debugger)
         self.MaxScoreNumberLayout.TextInput.bind(
             on_text_validate=self.button_pressed_change_max_score_number)
         self.MaxScoreNumberLayout.submit = Button(
@@ -95,7 +96,7 @@ class PlayerSettings(GridLayout):
         self.index_player = index_player
 
         self.name = FormattedTextInput(
-            text=SettingsLayout.settings_screen.main_screen.controller.model.player[index_player].name, debug=self.SettingsLayout.settings_screen.main_screen.controller.debug)
+            text=SettingsLayout.settings_screen.main_screen.controller.model.player[index_player].name, debugger=self.SettingsLayout.settings_screen.main_screen.controller.debugger)
         self.name.bind(on_text_validate=self.change_player_name)
         self.submit = Button(
             text="change name", background_color=self.SettingsLayout.settings_screen.main_screen.controller.model.colors["button"])
@@ -118,16 +119,18 @@ class PlayerSettings(GridLayout):
 
 
 class FormattedTextInput(TextInput):
-    def __init__(self, text, debug=False) -> None:
+    def __init__(self, text, debugger=[]) -> None:
         super(FormattedTextInput, self).__init__()
         self.halign = "center"
         self.multiline = False
 
-        if debug:
-            self.padding_y = [self.height / 2.0 * 800/1334 -
-                              (self.line_height / 2.0 * 800/1334), 0]
+        if isinstance(debugger, Debugger) and debugger.active:
+            scale_factor = debugger.window_size_old[0] / \
+                (debugger.window_size_new[0]*2)  # Faktor 2 unklar
+            self.padding_y = [(self.height / 2.0 -
+                              self.line_height / 2.0)*scale_factor, 0]
         else:
             self.padding_y = [self.height / 2.0 -
-                              (self.line_height / 2.0), 0]
+                              self.line_height / 2.0, 0]
 
         self.text = str(text)

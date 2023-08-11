@@ -3,6 +3,7 @@ class Model:
         self.number_of_players = 2
         self.max_score_number = 11
         self.sound_activated = False
+        self.debug_active = True
         self.language = "English"  # Sprache hängt von installierten Sprachen ab
 
         self.player = []

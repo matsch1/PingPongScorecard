@@ -5,7 +5,6 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 from kivy.uix.popup import Popup
-from kivy.core.window import Window
 
 
 class MainWindow(Screen):
@@ -13,10 +12,8 @@ class MainWindow(Screen):
         super(MainWindow, self).__init__(**kwargs)
         self.controller = controller
         # Window.clearcolor = (0, 0.6, 0.1, 1.0)
-        if self.controller.debug:
-            self.window_size_old = Window.size
-            self.window_size_new = [1334/2, 750/2]
-            Window.size = (self.window_size_new)
+        if self.controller.debugger.active:
+            self.controller.debugger.rescale_windowsize()
 
         self.LayoutMain = LayoutMain(self)
         self.add_widget(self.LayoutMain)
